@@ -9,7 +9,7 @@
     "dev": "nodemon index.js",
     "build:ui": "(if exist build rmdir /s /q build )&& cd ../fullstackExercises/part2/phonebook && npm run build --prod && xcopy /E build ..\\..\\..\\fullstackExercises2\\build\\",
     "deploy": "git push heroku main",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push -u origin main && npm run deploy",
     "logs:prod": "heroku logs --tail"
   },
   "author": "hyun chae",
