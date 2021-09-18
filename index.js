@@ -24,82 +24,82 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :p
 
 // define error handler
 const errorHandler = (err, req, res, next) => {
-    console.error(err.message)
-    
-    //cast error is caused by invalid object id for Mongo
-    if (err.name === 'CastError') {
-        return res.status(400).send({ error: 'malformatted id'})
-    // validation error is caused by mongoose validation failure. e.g. post request violates mongoose schema
-    } else if (err.name === 'ValidationError'){
-        return res.status(400).send({ error: err.message})
-    }
+  console.error(err.message)
 
-    //all other errors are passed to the default express error handler
-    next(err)
+  //cast error is caused by invalid object id for Mongo
+  if (err.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' })
+    // validation error is caused by mongoose validation failure. e.g. post request violates mongoose schema
+  } else if (err.name === 'ValidationError'){
+    return res.status(400).send({ error: err.message })
+  }
+
+  //all other errors are passed to the default express error handler
+  next(err)
 }
 
 app.post('/api/persons', (req, res, next) => {
-    const body = req.body
+  const body = req.body
 
-    const person = new Person({
-        ...body
-    })
-    person
-        .save()
-        .then(savedPerson => savedPerson.toJSON())
-        .then(formattedPerson => res.json(formattedPerson))
-        .catch(err => next(err))
+  const person = new Person({
+    ...body
+  })
+  person
+    .save()
+    .then(savedPerson => savedPerson.toJSON())
+    .then(formattedPerson => res.json(formattedPerson))
+    .catch(err => next(err))
 })
 
 app.get('/api/persons', (req, res, next) => {
-    Person.find({})
+  Person.find({})
     .then(persons => res.json(persons))
     .catch(err => next(err))
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
-    const id = req.params.id
-    console.log(id)
-    Person.findById(id)
-        .then(person => {
-            if(person){
-                res.json(person)
-            } 
-            // mongoDB returns null if there is no matching person, handle it. 404 not found
-            else {
-                response.status(404).end()
-        }
-        })
-        // if next is called with prameter, the execution will continue to the error handler middleware.
-        // if it is called without parameter, it goes to the next route or middleware
-        .catch(error => next(error)
-        )
+  const id = req.params.id
+  console.log(id)
+  Person.findById(id)
+    .then(person => {
+      if(person){
+        res.json(person)
+      }
+      // mongoDB returns null if there is no matching person, handle it. 404 not found
+      else {
+        response.status(404).end()
+      }
+    })
+  // if next is called with prameter, the execution will continue to the error handler middleware.
+  // if it is called without parameter, it goes to the next route or middleware
+    .catch(error => next(error)
+    )
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
-    const person = req.body
+  const person = req.body
 
-    Person.findByIdAndUpdate(req.params.id, person, { new: true, runValidators: true, context: 'query'})
-    
+  Person.findByIdAndUpdate(req.params.id, person, { new: true, runValidators: true, context: 'query' })
+
     // in default, originl person is returned. with option {new: true}, the updated person is returned
     .then(updatedPerson => {
-        res.json(updatedPerson)
+      res.json(updatedPerson)
     })
     .catch(err => next(err))
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
-    const id = req.params.id
-    Person.findByIdAndRemove(id)
+  const id = req.params.id
+  Person.findByIdAndRemove(id)
     .then(result => {
-        // 204: no content. It handles both deleting existing note and non-existing note from DB.
-        res.status(204).end()
+      // 204: no content. It handles both deleting existing note and non-existing note from DB.
+      res.status(204).end()
     })
     .catch(err => next(err))
 })
 
 app.get('/api/info', (req, res, next) => {
-    Person.find({})
+  Person.find({})
     .then(persons => res.send(`Phonebook has info for ${persons.length} people
     ${new Date()}`))
     .catch(err => next(err))
@@ -110,5 +110,5 @@ app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+  console.log(`Server running on port ${PORT}`)
 })
